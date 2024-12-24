@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech Synthesis</title>
+</head>
+<body>
+    <h1>Text-to-Speech Synthesis</h1>
+    <form id="synthesizeForm">
+        <label for="text">Enter Text:</label><br>
+        <textarea id="text" name="text" rows="4" cols="50"></textarea><br><br>
+        <button type="submit">Generate Speech</button>
+    </form>
+    <br>
+    <audio id="audioPlayer" controls style="display: none;">
+        <source id="audioSource" src="" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+    <script>
+        document.getElementById('synthesizeForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const text = document.getElementById('text').value;
+            
+            const formData = new FormData();
+            formData.append('text', text);
+            
+            const response = await fetch('/synthesize', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const audioPlayer = document.getElementById('audioPlayer');
+                const audioSource = document.getElementById('audioSource');
+                
+                audioSource.src = data.audio_url;
+                audioPlayer.style.display = 'block';
+                audioPlayer.load();
+                audioPlayer.play();
+            } else {
+                alert('Error generating speech. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
